@@ -14,5 +14,3 @@ export const load = async ({ fetch }) => {
       nations: parsedCsvNation.data
     }
 }
-
-export const ssr = false;

@@ -2,19 +2,30 @@
 <script>
     import { onMount } from "svelte";
     import L from "leaflet";
-  
+
+    export let data ;
+
     let map;
   
     onMount(async () => {
-      var map = L.map('map', {crs: L.CRS.Simple, minZoom: -5});
+      var map = L.map('map', {crs: L.CRS.Simple, minZoom: -1});
 
-      var imageUrl = 'https://github.com/trangtph/Map_Forgotten_Realms/blob/6f6595211ad1d815da80e0a457fbc8e3173d874c/Map_Forgotten_Realms_off_small.png';
-      var imageBounds = [[0,0], [1000,1000]];
-
+      var imageUrl = 'https://github.com/trangtph/Map_Forgotten_Realms/blob/main/Map_Forgotten_Realms_off.png?raw=true';
+      var imageBounds = [[0,0], [660,1000]];
       var image = L.imageOverlay(imageUrl, imageBounds).addTo(map);
       map.fitBounds(imageBounds);
+
+      var marker = L.marker([510 , 170]).addTo(map);
+
+
 });
 </script>
+
+<ul>
+  {#each data.nations as nation}
+  <li>id: {nation.id}</li>
+  {/each}
+</ul>
 
 <svelte:head>
   <link
@@ -34,6 +45,6 @@
 
 <style>
   #map {
-      height: 600px;
+      height: 1000px;
   }
 </style>
