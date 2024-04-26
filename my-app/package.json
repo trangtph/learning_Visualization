@@ -29,6 +29,8 @@
 	"type": "module",
 	"dependencies": {
 		"d3-scale": "^4.0.2",
-		"papaparse": "^5.4.1"
+		"leaflet": "^1.9.4",
+		"papaparse": "^5.4.1",
+		"svelte-overlay": "^1.4.1"
 	}
 }
