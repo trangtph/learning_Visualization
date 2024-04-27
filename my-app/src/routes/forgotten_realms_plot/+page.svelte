@@ -2,9 +2,7 @@
 <script>
     import { onMount } from "svelte";
     import L from "leaflet";
-
-
-
+    export let data ;
     let map;
   
     onMount(async () => {
@@ -16,6 +14,10 @@
       map.fitBounds(imageBounds);
 
       var marker = L.marker([60 , 380]).addTo(map);
+
+      data.nations.forEach((d) => {
+        L.marker([d.y_coord, d.x_coord]).addTo(map);
+    });
 
     });
 </script>
