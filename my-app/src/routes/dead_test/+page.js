@@ -2,7 +2,7 @@ import Papa from 'papaparse'
 
 export const load = async ({ fetch }) => {
 
-    const nation = await fetch('https://raw.githubusercontent.com/trangtph/Programming/57d492490c8c4e1624ace7d9d1af87b5bd0b4326/Processed_data/nation_region_coordinate.csv', {
+    const nation = await fetch('https://raw.githubusercontent.com/trangtph/Programming/main/Processed_data/nation_customer_revenue.csv', {
       headers: {
         'Content-Type': 'text/csv'
     }})
