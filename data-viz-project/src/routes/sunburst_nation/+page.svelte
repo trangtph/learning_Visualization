@@ -1,31 +1,91 @@
+<h1> Number of customers and total revenue per nation</h1>
+
 <script>
-	import {onMount} from 'svelte';
+	import { onMount } from "svelte";
+	import L from "leaflet";
 	import * as d3 from 'd3';
+	import { scaleLinear } from 'd3-scale';
 
 
-	let element;
-	
-	onMount(async function() {
-		let data2 = await d3.json('https://raw.githubusercontent.com/trangtph/Programming/main/Processed_data/hot_product_nation_hiera.json');
-		//console.log(data);
-		
-		let chart = Sunburst(data2, {
-			value: d => d.revenue, // size of each node (file); null for internal nodes (folders)
-			label: d => d.name, // display name for each cell
-			title: (d, n) => `${n.ancestors().reverse().map(d => d.data.name).join(".")}\n${n.value.toLocaleString("en")}`, // hover text
-			width: 1152,
-			height: 1152
+	const scaleR = scaleLinear().domain([0, 160]).range([0, 50]);
+	const scaleColour = scaleLinear().domain([1000000, 160000000]).range(["#fff5f0", "#67000d"]);
+	const scaleR2 = scaleLinear().domain([1000000, 160000000]).range([0, 70]);
+	const scaleColour2 = scaleLinear().domain([0, 160]).range(["#fff5f0", "#67000d"]);
+	const color_region = d3.scaleOrdinal(["Amnian Empire", "Bloodlands Empire", "Calim Empire",
+	  "Dwarven Empire", "Eastern Empire", "Halruaan Empire",
+	  "New Neverwinter Empire", "None Empire", "Old Empire",
+	  "Purple Dragon Empire", "Southern Empire", "Thayan Empire",
+	  "United Moonshae Empire", "Waterdhavian Empire", "Western Empire"],
+	  ["#2673a3", "#b0799a", "#ef8737",
+		"#355828", "#6c5d9e", "#bf3729",
+		"#e48171", "#f5bb50", "#9d9cd5",
+		"#17154f", "#f6b3b0", "#ada43b",
+		"#8b3a2b", "#b38711", "#9cc184"]);
+  
+		onMount(async function () {
+    let data = await d3.csv('https://raw.githubusercontent.com/trangtph/Programming/main/Processed_data/nation_customer_revenue.csv');
+    let data2 = await d3.json('http://localhost:5173/top10.json');
+    var map = L.map('map', { crs: L.CRS.Simple, minZoom: -1 });
+
+    var imageUrl = 'https://github.com/trangtph/Map_Forgotten_Realms/blob/main/Map_Forgotten_Realms_off.png?raw=true';
+    var imageBounds = [[0, 0], [660, 1000]];
+    var image = L.imageOverlay(imageUrl, imageBounds).addTo(map);
+	map.setMaxBounds(imageBounds);
+	map.fitBounds(imageBounds);
+
+    for (var i in data) {
+        var row = data[i];
+        var circle_color = scaleColour2(row.n_customer);
+        var radius_transform = scaleR2(row.revenue);
+        var border_transform = color_region(row.Region);
+        var pop_up_text = 'Nation: ' + row.Nation + '<br>' + 'Region: ' + row.Region +
+            '<br>' + 'Number of customer: ' + row.n_customer + ', rank ' + row.rank_n_customer +
+            '<br>' + 'Total revenue: ' + row.revenue_round + ' Million CP' + ', rank ' + row.rank_revenue;
+
+        var circle = L.circle([row.y_coord, row.x_coord], {
+            radius: radius_transform,
+            color: border_transform,
+            fillColor: circle_color,
+            fillOpacity: 0.8
+        });
+        circle.bindTooltip(pop_up_text);
+		circle.nation = row.Nation;
+
+		circle.on('click', function () {
+
+            //var clickedNation = row.Nation;
+            var filteredData = filterByName(data2, this.nation);
+
+        //var chart = Sunburst(filteredData, {
+		var chart = Sunburst(filteredData, {
+                value: d => d.Percentage,
+                label: d => d.name,
+                title: (d, n) => `${n.ancestors().reverse().map(d => d.data.name).join(".")}\n${n.value.toLocaleString("en")}`,
+                width: 300,
+                height: 300
+            });
+			d3.select('#chart').selectAll("*").remove();
+            d3.select('#chart').append(()=>chart);
 		});
-		
-		d3.select(element).append(() => chart);
-		// Or alternatively, via the native DOM API:
-		// element.appendChild(chart)
-	});
-	
-	// Copyright 2021 Observable, Inc.
-	// Released under the ISC license.
-	// https://observablehq.com/@d3/sunburst
-	function Sunburst(data, { // data is either tabular (array of objects) or hierarchy (nested objects)
+        circle.addTo(map);
+
+	} 
+})
+function filterByName(node, nameToFilter) {
+			if (node.name === nameToFilter) {
+                return node;
+            }
+            if (node.children) {
+                for (let i = 0; i < node.children.length; i++) {
+                    let result = filterByName(node.children[i], nameToFilter);
+                    if (result) {
+                        return result;
+                    }
+                }
+            }
+            return null;
+        }
+		function Sunburst(data, { // data is either tabular (array of objects) or hierarchy (nested objects)
 		path, // as an alternative to id and parentId, returns an array identifier, imputing internal nodes
 		id = Array.isArray(data) ? d => d.id : null, // if tabular data, given a d in data, returns a unique identifier (string)
 		parentId = Array.isArray(data) ? d => d.parentId : null, // if tabular data, given a node d, returns its parent’s identifier
@@ -36,8 +96,8 @@
 		title, // given a node d, returns its hover text
 		link, // given a node d, its link (if any)
 		linkTarget = "_blank", // the target attribute for links (if any)
-		width = 640, // outer width, in pixels
-		height = 400, // outer height, in pixels
+		width = 100, // outer width, in pixels
+		height = 100, // outer height, in pixels
 		margin = 1, // shorthand for margins
 		marginTop = margin, // top margin, in pixels
 		marginRight = margin, // right margin, in pixels
@@ -127,10 +187,76 @@
 	}
 </script>
 
-<div bind:this={element}>	
+<svelte:head>
+	<link
+	  rel="stylesheet"
+	  href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+	  crossorigin=""
+	/>
+  
+	<script
+	  src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+	  crossorigin=""
+	>
+	</script>
+  </svelte:head>
+  
+  
+  <div id="map" style="float: left; width: 100%; height: 700px; position: absolute;">
+	<div id="missing">
+	  Nations with missing data <br> on location
+	</div>
+  <div id = "encoding">
+    <h3> Visual Encoding:</h3>
+    <ul>
+      <li>Circle size: total revenue</li>
+      <li>Circle color saturation: number of customer</li>
+      <li>Circle outline color: the region that the nation belongs to</li>
+      </ul>
+  </div>
+  <div id="chart" style="position: absolute; right: 10px; top: 10px; width: 20%; height: 600px; z-index: 1000;"></div>
+</div> 
 
-</div>
+
 
 <style>
+#map {
+    height: 660px;
+}
 
+#missing {
+  position: absolute;
+  top: 5px;
+  left: 70px;
+  font-weight: bold;
+  font-size: 12px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+#encoding {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+  h1 {
+    color: #67000d;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+  }
+
+  h3 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  ul {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
 </style>
