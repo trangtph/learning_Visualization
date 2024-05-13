@@ -24,7 +24,7 @@
   
 		onMount(async function () {
     let data = await d3.csv('https://raw.githubusercontent.com/trangtph/Programming/main/Processed_data/nation_customer_revenue.csv');
-    let data2 = await d3.json('http://localhost:5173/top10.json');
+    let data2 = await d3.json('https://raw.githubusercontent.com/trangtph/learning_Visualization/main/data-viz-project/src/routes/sunburst_nation/top10_2.json');
     var map = L.map('map', { crs: L.CRS.Simple, minZoom: -1 });
 
     var imageUrl = 'https://github.com/trangtph/Map_Forgotten_Realms/blob/main/Map_Forgotten_Realms_off.png?raw=true';
