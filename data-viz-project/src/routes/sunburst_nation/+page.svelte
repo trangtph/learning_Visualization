@@ -33,6 +33,8 @@
 	map.setMaxBounds(imageBounds);
 	map.fitBounds(imageBounds);
 
+	var chart;
+
     for (var i in data) {
         var row = data[i];
         var circle_color = scaleColour2(row.n_customer);
@@ -168,17 +170,17 @@ function filterByName(node, nameToFilter) {
 				.attr("fill", color ? d => color(d.ancestors().reverse()[1]?.index) : fill)
 				.attr("fill-opacity", fillOpacity);
 
-		if (label != null) cell
-			.filter(d => (d.y0 + d.y1) / 2 * (d.x1 - d.x0) > 10)
-			.append("text")
-				.attr("transform", d => {
-					if (!d.depth) return;
-					const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
-					const y = (d.y0 + d.y1) / 2;
-					return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
-				})
-				.attr("dy", "0.32em")
-				.text(d => label(d.data, d));
+				if (label != null) {
+  cell.filter(d => (d.y0 + d.y1) / 2 * (d.x1 - d.x0) > 10)
+    .append("text")
+    .attr("dy", "0.32em")
+    .attr("transform", d => {
+      const [x, y] = arc.centroid(d);
+      return `translate(${x}, ${y})`;
+    })
+    .attr("text-anchor", "middle")
+    .text(d => label(d.data, d));
+}
 
 		if (title != null) cell.append("title")
 				.text(d => title(d.data, d));
@@ -206,15 +208,8 @@ function filterByName(node, nameToFilter) {
 	<div id="missing">
 	  Nations with missing data <br> on location
 	</div>
-  <div id = "encoding">
-    <h3> Visual Encoding:</h3>
-    <ul>
-      <li>Circle size: total revenue</li>
-      <li>Circle color saturation: number of customer</li>
-      <li>Circle outline color: the region that the nation belongs to</li>
-      </ul>
+  <div id="chart" style="position: absolute; right: 10px; top: 10px; width: 20%; height: 600px; z-index: 1000;">
   </div>
-  <div id="chart" style="position: absolute; right: 10px; top: 10px; width: 20%; height: 600px; z-index: 1000;"></div>
 </div> 
 
 
@@ -227,7 +222,7 @@ function filterByName(node, nameToFilter) {
 #missing {
   position: absolute;
   top: 5px;
-  left: 70px;
+  left: 40px;
   font-weight: bold;
   font-size: 12px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
