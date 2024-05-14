@@ -17,7 +17,7 @@ Number of times they are ordered together:
 	let element;
 
 	onMount(async function() {
-		let data = await d3.json('http://localhost:5173/network_typesub.json');
+		let data = await d3.json('https://raw.githubusercontent.com/trangtph/learning_Visualization/main/data-viz-project/src/routes/product_link/network_typesub.json');
 		console.log(data);
 		
 		let chart = ForceGraph(data, {

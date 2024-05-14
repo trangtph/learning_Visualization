@@ -24,7 +24,7 @@
   
 		onMount(async function () {
     let data = await d3.csv('https://raw.githubusercontent.com/trangtph/Programming/main/Processed_data/nation_customer_revenue.csv');
-    let data2 = await d3.json('https://raw.githubusercontent.com/trangtph/learning_Visualization/main/data-viz-project/src/routes/sunburst_nation/top10_2.json');
+    let data2 = await d3.json('https://raw.githubusercontent.com/trangtph/Programming/main/Processed_data/top_product_nation_final.json');
     var map = L.map('map', { crs: L.CRS.Simple, minZoom: -1 });
 
     var imageUrl = 'https://github.com/trangtph/Map_Forgotten_Realms/blob/main/Map_Forgotten_Realms_off.png?raw=true';
@@ -63,8 +63,8 @@
                 value: d => d.Percentage,
                 label: d => d.name,
                 title: (d, n) => `${n.ancestors().reverse().map(d => d.data.name).join(".")}\n${n.value.toLocaleString("en")}`,
-                width: 300,
-                height: 300
+                width: 1000,
+                height: 1000
             });
 			d3.select('#chart').selectAll("*").remove();
             d3.select('#chart').append(()=>chart);
@@ -100,14 +100,14 @@ function filterByName(node, nameToFilter) {
 		linkTarget = "_blank", // the target attribute for links (if any)
 		width = 100, // outer width, in pixels
 		height = 100, // outer height, in pixels
-		margin = 1, // shorthand for margins
+		margin = 50, // shorthand for margins
 		marginTop = margin, // top margin, in pixels
 		marginRight = margin, // right margin, in pixels
 		marginBottom = margin, // bottom margin, in pixels
 		marginLeft = margin, // left margin, in pixels
 		padding = 1, // separation between arcs
 		radius = Math.min(width - marginLeft - marginRight, height - marginTop - marginBottom) / 2, // outer radius
-		color = d3.interpolateRainbow, // color scheme, if any
+		color = d3.interpolateWarm, // color scheme, if any
 		fill = "#ccc", // fill for arcs (if no color encoding)
 		fillOpacity = 0.6, // fill opacity for arcs
 	} = {}) {
@@ -155,7 +155,7 @@ function filterByName(node, nameToFilter) {
 				.attr("height", height)
 				.attr("style", "max-width: 100%; height: auto; height: intrinsic;")
 				.attr("font-family", "sans-serif")
-				.attr("font-size", 10)
+				.attr("font-size", 19)
 				.attr("text-anchor", "middle");
 
 		const cell = svg
@@ -208,7 +208,15 @@ function filterByName(node, nameToFilter) {
 	<div id="missing">
 	  Nations with missing data <br> on location
 	</div>
-  <div id="chart" style="position: absolute; right: 10px; top: 10px; width: 20%; height: 600px; z-index: 1000;">
+	<div id = "encoding">
+		<h3> Visual encoding of bubble map:</h3>
+		<ul>
+		  <li>Bubble size: total revenue</li>
+		  <li>Bubble color saturation: number of customer</li>
+		  <li>Bubble outline color: the region that the nation belongs to</li>
+		  </ul>
+	  </div>
+  <div id="chart" style="position: absolute; right: 50px; top: 20px; width: 25%; height: 1300px; z-index: 1000;">
   </div>
 </div> 
 
@@ -233,7 +241,7 @@ function filterByName(node, nameToFilter) {
 
 #encoding {
   position: absolute;
-  right: 0px;
+  right: 20px;
   bottom: 0px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: white;
