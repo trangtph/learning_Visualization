@@ -206,7 +206,7 @@ function filterByName(node, nameToFilter) {
   
   <div id="map" style="float: left; width: 100%; height: 700px; position: absolute;">
 	<div id="missing">
-	  Nations with missing data on location
+	  Nations with missing data <br> on location
 	</div>
 	<div id = "encoding">
 		<h3> Visual encoding of bubble map:</h3>
@@ -230,7 +230,7 @@ function filterByName(node, nameToFilter) {
 #missing {
   position: absolute;
   top: 20px;
-  left: 200px;
+  left: 50px;
   font-weight: bold;
   font-size: 12px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
